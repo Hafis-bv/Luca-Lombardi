@@ -73,9 +73,12 @@ export function Navbar() {
             </Link>
           ))}
         </div>
-        <button className="cursor-pointer rounded-lg bg-black px-9 py-3 text-sm font-normal text-white">
+        <Link
+          href={"/contact"}
+          className="cursor-pointer rounded-lg bg-black px-9 py-3 text-sm font-normal text-white"
+        >
           Contact Us!
-        </button>
+        </Link>
       </Container>
       <MobileMenu navLinks={navLinks} active={active} setActive={setActive} />
     </nav>
