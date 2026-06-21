@@ -26,7 +26,7 @@ export function ContactForm() {
     general: null,
   });
   const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState<string | null>("akjeqwoiehqwoiu");
+  const [success, setSuccess] = useState<string | null>(null);
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
@@ -41,6 +41,7 @@ export function ContactForm() {
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
     const result = contactSchema.safeParse(formData);
 
     if (!result.success) {
@@ -60,6 +61,13 @@ export function ContactForm() {
     const validatedData = result.data;
 
     setLoading(true);
+    setErrors({
+      name: null,
+      phone: null,
+      email: null,
+      message: null,
+      general: null,
+    });
 
     try {
       await axios.post("/api/contact", validatedData);
@@ -137,9 +145,13 @@ export function ContactForm() {
             )}
           </div>
           {errors.general && (
-            <span className="text-red-600 text-sm">{errors.general}</span>
+            <span className="text-red-600 text-sm col-span-2">
+              {errors.general}
+            </span>
           )}
-          {success && <span className="text-xl text-blue-600">{success}</span>}
+          {success && (
+            <span className="text-sm text-green-600 col-span-2">{success}</span>
+          )}
           <button
             disabled={loading}
             className="bg-black col-span-2 text-white w-full font-medium tracking-[2px] py-3 rounded-3xl cursor-pointer"

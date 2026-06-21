@@ -20,16 +20,18 @@ export function Privacy() {
     },
   ];
   return (
-    <Container className="flex flex-wrap items-center justify-center lg:justify-around gap-16 py-10 bg-gray-100">
-      {privacy.map((item) => (
-        <div
-          key={item.id}
-          className="flex flex-col items-center text-center max-w-[260px] gap-3"
-        >
-          <div>{item.icon}</div>
-          <p className="text-lg font-medium text-gray-800">{item.text}</p>
-        </div>
-      ))}
-    </Container>
+    <div className="bg-gray-100">
+      <Container className="flex flex-wrap items-center justify-center lg:justify-around gap-16 py-10 ">
+        {privacy.map((item) => (
+          <div
+            key={item.id}
+            className="flex flex-col items-center text-center max-w-[260px] gap-3"
+          >
+            <div>{item.icon}</div>
+            <p className="text-lg font-medium text-gray-800">{item.text}</p>
+          </div>
+        ))}
+      </Container>
+    </div>
   );
 }
