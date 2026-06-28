@@ -10,7 +10,9 @@ export default function NewCollectionPage() {
         description="A new collection shaped by modern elegance — contemporary pieces for men and women, crafted with attention to detail and form."
         className="bg-new-collection"
       />
-      <NewCollection />
+      <NewCollection title="For men" />
+      <NewCollection title="For women" />
+      <NewCollection title="Sunglasses" />
     </>
   );
 }

@@ -12,7 +12,7 @@ export const menCollection = Array.from({ length: 10 }, (_, i) => ({
   title: "Quiet Luxury",
   price: 557,
   image: "https://luca-lombardi-three.vercel.app/men/urban.png",
-  isNew: i % 3 == 0 ? true : false,
+  isNew: true,
   collection: "men-collection",
 }));
 

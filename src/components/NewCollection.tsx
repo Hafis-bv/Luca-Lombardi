@@ -3,46 +3,52 @@
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 
-import { collections, menCollection } from "@/data/collections";
+import { menCollection } from "@/data/collections";
 import { CollectionCard } from "./CollectionCard";
 import { Container } from "./Container";
 
-export default function NewCollection() {
+interface NewCollectionProps {
+  title: string;
+}
+
+export default function NewCollection({ title }: NewCollectionProps) {
   const newCollections = menCollection.filter((c) => c.isNew);
 
+  const breakpoints = {
+    320: {
+      slidesPerView: 1,
+      spaceBetween: 12,
+    },
+    640: {
+      slidesPerView: 2,
+      spaceBetween: 16,
+    },
+    1024: {
+      slidesPerView: 3,
+      spaceBetween: 20,
+    },
+    1280: {
+      slidesPerView: 4,
+      spaceBetween: 24,
+    },
+  };
+
   return (
-    <Container className="py-12 sm:py-16 lg:py-20 overflow-hidden">
-      <h3 className="mb-8 text-center text-2xl font-semibold sm:mb-10">For</h3>
+    <Container className="w-full min-w-0 py-12 sm:py-16 lg:py-20">
+      <h3 className="mb-8 text-2xl font-semibold sm:mb-10">
+        {title}
+      </h3>
 
       <Swiper
-        spaceBetween={16}
+        className="w-full min-w-0"
         slidesPerView={1}
-        loop={false}
-        grabCursor
-        watchOverflow
-        breakpoints={{
-          480: {
-            slidesPerView: 1,
-            spaceBetween: 16,
-          },
-          640: {
-            slidesPerView: 2,
-            spaceBetween: 20,
-          },
-          1024: {
-            slidesPerView: 3,
-            spaceBetween: 24,
-          },
-          1280: {
-            slidesPerView: 4,
-            spaceBetween: 32,
-          },
-        }}
-        className="w-full max-w-full overflow-hidden"
+        spaceBetween={12}
+        breakpoints={breakpoints}
+        loop
       >
-        {newCollections.map((col) => (
-          <SwiperSlide key={col.id} className="min-w-0">
-            <CollectionCard collection={col} />
+        {newCollections.map((collection) => (
+          <SwiperSlide key={collection.id}>
+            <CollectionCard collection={collection} />
           </SwiperSlide>
         ))}
       </Swiper>

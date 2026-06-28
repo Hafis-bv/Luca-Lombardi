@@ -23,7 +23,7 @@ export function CollectionCard({ collection }: CardProps) {
           </span>
         )}
       </div>
-      <div className="flex items-center justify-between mt-4 w-full px-2">
+      <div className="flex items-center justify-between mt-7 w-full px-2">
         <h2>{collection.title}</h2>
         <span className="text-sm">{collection.price}$</span>
       </div>
