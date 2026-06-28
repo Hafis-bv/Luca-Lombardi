@@ -1,4 +1,4 @@
-import { NavLink } from "@/types/NavLink";
+import { NavLink } from "@/types/navLink";
 import Link from "next/link";
 import { FiShoppingCart } from "react-icons/fi";
 import { IoMdSearch } from "react-icons/io";

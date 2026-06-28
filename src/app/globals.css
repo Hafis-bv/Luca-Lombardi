@@ -8,3 +8,39 @@
   background-size: cover;
   height: 60vh;
 }
+
+.bg-women {
+  background-image:
+    linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)),
+    url("https://luca-lombardi-three.vercel.app/women-collection.png");
+  background-position: center;
+  background-size: cover;
+  height: 60vh;
+}
+
+.bg-men {
+  background-image:
+    linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)),
+    url("https://luca-lombardi-three.vercel.app/men-collection.png");
+  background-position: center;
+  background-size: cover;
+  height: 60vh;
+}
+
+.bg-sunglasses {
+  background-image:
+    linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)),
+    url("https://luca-lombardi-three.vercel.app/sunglasses/sunglasses-collection.png");
+  background-position: center;
+  background-size: cover;
+  height: 60vh;
+}
+
+.bg-new-collection {
+  background-image:
+    linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)),
+    url("https://luca-lombardi-three.vercel.app/new-collection.png");
+  background-position: center;
+  background-size: cover;
+  height: 60vh;
+}
