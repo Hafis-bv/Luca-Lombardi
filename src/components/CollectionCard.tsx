@@ -15,7 +15,7 @@ export function CollectionCard({ collection }: CardProps) {
         <img
           src={collection.image}
           alt={collection.title}
-          className="h-auto xl:h-100 object-cover rounded-xl w-full shadow-2xl"
+          className="h-100 object-cover rounded-xl w-full shadow-2xl"
         />
         {collection.isNew && (
           <span className="absolute left-3 top-3 rounded-full bg-black px-3 py-1 text-xs font-semibold uppercase tracking-wide text-white">

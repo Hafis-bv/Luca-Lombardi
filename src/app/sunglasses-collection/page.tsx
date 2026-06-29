@@ -1,6 +1,11 @@
 import { Collections } from "@/components/Collections";
 import { Hero } from "@/components/Hero";
 import { sunglassesCollection } from "@/data/collections";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Sunglasses Collection",
+};
 
 export default function SunglassesPage() {
   return (

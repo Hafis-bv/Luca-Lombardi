@@ -1,6 +1,11 @@
 import { Collections } from "@/components/Collections";
 import { Hero } from "@/components/Hero";
 import { womenCollection } from "@/data/collections";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Women Collection",
+};
 
 export default function WomenPage() {
   return (

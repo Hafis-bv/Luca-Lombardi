@@ -5,7 +5,12 @@ import {
   sunglassesCollection,
   womenCollection,
 } from "@/data/collections";
+import { Metadata } from "next";
 import React from "react";
+
+export const metadata: Metadata = {
+  title: "New Collection",
+};
 
 export default function NewCollectionPage() {
   return (

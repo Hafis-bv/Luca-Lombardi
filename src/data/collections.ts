@@ -5,6 +5,7 @@ export const womenCollection = Array.from({ length: 10 }, (_, i) => ({
   image: "/women.jpeg",
   isNew: i % 2 === 0,
   collection: "women-collection",
+  popular: i % 3 === 0,
 }));
 
 export const menCollection = Array.from({ length: 10 }, (_, i) => ({
@@ -14,6 +15,7 @@ export const menCollection = Array.from({ length: 10 }, (_, i) => ({
   image: "https://luca-lombardi-three.vercel.app/men/urban.png",
   isNew: i % 2 === 0,
   collection: "men-collection",
+  popular: i % 3 === 0,
 }));
 
 export const sunglassesCollection = Array.from({ length: 10 }, (_, i) => ({
@@ -24,6 +26,7 @@ export const sunglassesCollection = Array.from({ length: 10 }, (_, i) => ({
     "https://luca-lombardi-three.vercel.app/sunglasses/sunglasses-milan.png",
   isNew: i % 2 === 0,
   collection: "sunglasses-collection",
+  popular: i % 3 === 0,
 }));
 
 export const collections = [
