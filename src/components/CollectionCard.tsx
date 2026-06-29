@@ -9,7 +9,7 @@ export function CollectionCard({ collection }: CardProps) {
   return (
     <Link
       className="flex flex-col items-center justify-center text-center max-w-85 mx-auto"
-      href={`/${collection.id}`}
+      href={`/${collection.collection}/${collection.id}`}
     >
       <div className="relative w-full">
         <img
