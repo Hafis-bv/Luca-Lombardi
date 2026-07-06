@@ -1,3 +1,11 @@
+export type Size = "XS" | "S" | "M" | "L" | "XL";
+
+export interface CollectionSize {
+  id: number;
+  size: string;
+  stock: number;
+}
+
 export interface Collection {
   id: number;
   image: string;
@@ -5,4 +13,5 @@ export interface Collection {
   price: number;
   isNew: boolean;
   collection: string;
+  sizes: CollectionSize[];
 }

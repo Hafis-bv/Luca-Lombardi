@@ -1,6 +1,9 @@
+"use client";
+
 import { Collection } from "@/types/collection";
-import Link from "next/link";
 import BreadCrumb from "./BreadCrumb";
+import { SizeSelector } from "./SizeSelector";
+import { useState } from "react";
 
 interface ProductDetailProps {
   collection: Collection;
@@ -27,6 +30,19 @@ export const productBenefits = [
 ];
 
 export default function ProductDetails({ collection }: ProductDetailProps) {
+  const [selectedSizeId, setSelectedSizeId] = useState<number | null>(null);
+  const selectedSize = collection.sizes.find((s) => s.id == selectedSizeId);
+  const [sizeError, setSizeError] = useState<string | null>(null);
+
+  function handleAddToCart() {
+    if (!selectedSize) return setSizeError("Please select a size");
+    setSizeError(null);
+  }
+
+  function handleSizeSelect(sizeId: number) {
+    setSizeError(null);
+    setSelectedSizeId(sizeId);
+  }
   return (
     <div className="min-h-screen bg-white">
       <div className="relative mx-auto w-full max-w-6xl px-5 sm:px-8 pt-10 pb-18">
@@ -58,12 +74,20 @@ export default function ProductDetails({ collection }: ProductDetailProps) {
                 Clean minimal piece from the women-collection collection.
                 Premium look, everyday comfort.
               </p>
+              <SizeSelector
+                sizes={collection.sizes}
+                selectedSizeId={selectedSizeId}
+                onSelect={handleSizeSelect}
+              />
+              {sizeError && (
+                <p className="text-xs text-red-500 mt-2">{sizeError}</p>
+              )}
               <div className="mt-7 flex flex-col gap-3">
-                <button className="h-12 rounded-2xl bg-zinc-900 text-white font-semibold tracking-wide hover:bg-black transition shadow-[0_10px_25px_rgba(0,0,0,0.18)] cursor-pointer">
+                <button
+                  onClick={handleAddToCart}
+                  className="h-12 rounded-2xl bg-zinc-900 text-white font-semibold tracking-wide hover:bg-black transition shadow-[0_10px_25px_rgba(0,0,0,0.18)] cursor-pointer"
+                >
                   Add to cart
-                </button>
-                <button className="h-12 rounded-2xl border border-zinc-200 bg-white text-zinc-900 font-semibold hover:border-zinc-400 transition cursor-pointer">
-                  Save for later
                 </button>
               </div>
               <div className="mt-8 grid grid-cols-3 gap-3">
