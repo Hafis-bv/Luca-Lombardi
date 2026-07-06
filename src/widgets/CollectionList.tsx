@@ -4,19 +4,28 @@ import { collections } from "@/data/collections";
 import { useAppSelector } from "@/hooks/redux";
 import { CollectionCard } from "@/components/CollectionCard";
 import { Container } from "@/components/Container";
+import { useMemo } from "react";
+import Fuse from "fuse.js";
 
 export function CollectionList() {
-  const searchValue = useAppSelector((state) => state.search.query);
+  const { query } = useAppSelector((state) => state.search);
 
-  const filteredCollections = collections.filter((collection) =>
-    collection.title.toLowerCase().includes(searchValue.toLowerCase()),
-  );
+  const fuse = useMemo(() => {
+    return new Fuse(collections, {
+      keys: ["title", "collection"],
+      threshold: 0.5,
+    });
+  }, [collections]);
+
+  const filteredCollections = query
+    ? fuse.search(query).map((r) => r.item)
+    : collections;
 
   return (
     <Container className="py-15">
-      {searchValue && (
+      {query && (
         <h1 className="text-2xl font-semibold mb-8 text-center">
-          Search results for “{searchValue}”
+          Search results for “{query}”
         </h1>
       )}
       {filteredCollections.length > 0 ? (
@@ -28,7 +37,7 @@ export function CollectionList() {
       ) : (
         <div className="flex justify-center items-center">
           <p className="text-gray-500 text-lg">
-            No products found for "{searchValue}"
+            No products found for "{query}"
           </p>
         </div>
       )}

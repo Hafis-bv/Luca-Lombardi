@@ -25,7 +25,7 @@ export function ContactForm() {
     message: null,
     general: null,
   });
-  const [loading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [success, setSuccess] = useState<string | null>(null);
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -60,7 +60,7 @@ export function ContactForm() {
 
     const validatedData = result.data;
 
-    setLoading(true);
+    setIsLoading(true);
     setErrors({
       name: null,
       phone: null,
@@ -84,7 +84,7 @@ export function ContactForm() {
 
       setErrors({ ...errors, general: message });
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
   return (
@@ -153,10 +153,10 @@ export function ContactForm() {
             <span className="text-sm text-green-600 col-span-2">{success}</span>
           )}
           <button
-            disabled={loading}
+            disabled={isLoading}
             className="bg-black col-span-2 text-white w-full font-medium tracking-[2px] py-3 rounded-3xl cursor-pointer"
           >
-            {loading ? "Sending..." : "Send"}
+            {isLoading ? "Sending..." : "Send"}
           </button>
         </form>
       </Container>
