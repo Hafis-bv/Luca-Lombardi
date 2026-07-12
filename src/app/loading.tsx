@@ -1,11 +1,7 @@
 "use client";
 
-import { BeatLoader } from "react-spinners";
+import { CustomLoading } from "@/components/CustomLoading";
 
 export default function Loading() {
-  return (
-    <div className="fixed inset-0 z-100 flex items-center justify-center bg-white">
-      <BeatLoader color="#1d293d" size={25} speedMultiplier={5} />
-    </div>
-  );
+  return <CustomLoading />;
 }

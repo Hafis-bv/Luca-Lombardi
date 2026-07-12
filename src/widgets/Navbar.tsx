@@ -7,9 +7,12 @@ import { BiMenuAltLeft } from "react-icons/bi";
 import { IoMdClose, IoMdSearch } from "react-icons/io";
 import { LuUser } from "react-icons/lu";
 import { MobileMenu } from "./MobileMenu";
-import { useAppDispatch } from "@/hooks/redux";
+import { useAppDispatch, useAppSelector } from "@/hooks/redux";
 import { setSearchQuery } from "@/store/slices/searchSlice";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
+import { title } from "process";
+import { UserMenu } from "./UserMenu";
 
 export function Navbar() {
   const navLinks = [
@@ -37,6 +40,7 @@ export function Navbar() {
 
   const [active, setActive] = useState(false);
   const [inputValue, setInputValue] = useState("");
+  const { user } = useAppSelector((state) => state.auth);
 
   const router = useRouter();
   const dispatch = useAppDispatch();
@@ -50,7 +54,6 @@ export function Navbar() {
     router.push("/search");
     setInputValue("");
   };
-
   return (
     <nav className="sticky top-0 z-30 w-full bg-white text-gray-600 shadow-sm">
       <Container className="flex items-center justify-between p-5">
@@ -79,13 +82,17 @@ export function Navbar() {
             </button>
           </form>
 
-          <Link
-            className="flex cursor-pointer items-center gap-2 text-sm transition hover:opacity-50"
-            href="/login"
-          >
-            <LuUser size={25} />
-            <span className="hidden md:block">Login</span>
-          </Link>
+          {user ? (
+            <UserMenu user={user} />
+          ) : (
+            <Link
+              className="flex cursor-pointer items-center gap-2 text-sm transition hover:opacity-50"
+              href="/login"
+            >
+              <LuUser size={25} />
+              <span className="hidden md:block">Login</span>
+            </Link>
+          )}
 
           <button
             onClick={() => setActive(!active)}

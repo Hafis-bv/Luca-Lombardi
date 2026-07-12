@@ -3,7 +3,9 @@
 import { GoogleIcon } from "@/assets/icons/GoogleIcon";
 import { Container } from "@/components/Container";
 import { Input } from "@/components/Input";
+import { useAuth } from "@/hooks/useAuth";
 import { AuthFormData, authSchema, ErrorAuthState } from "@/schemas/auth";
+import { FirebaseError } from "firebase/app";
 import Link from "next/link";
 import { ChangeEvent, FormEvent, useState } from "react";
 import { IoEye, IoEyeOff } from "react-icons/io5";
@@ -21,6 +23,7 @@ export function RegisterForm() {
     general: null,
   });
   const [isLoading, setIsLoading] = useState(false);
+  const { handleEmailRegister } = useAuth();
 
   function handleChange(e: ChangeEvent<HTMLInputElement>) {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -44,7 +47,7 @@ export function RegisterForm() {
       return;
     }
 
-    const validatedData = result.data;
+    const { email, password } = result.data;
 
     setIsLoading(true);
     setErrors({
@@ -54,14 +57,22 @@ export function RegisterForm() {
     });
 
     try {
+      const user = await handleEmailRegister(email, password);
+      console.log(user);
     } catch (err: any) {
       console.log(err);
-      const message =
-        err?.response?.data?.message ||
-        err?.response?.data?.err ||
-        "Something went wrong";
-
-      setErrors({ ...errors, general: message });
+      if (err instanceof FirebaseError) {
+        const code = err.code || "";
+        if (code == "auth/email-already-in-use") {
+          setErrors({ ...errors, general: "Email is already in use" });
+        } else if (code == "auth/weak-password") {
+          setErrors({ ...errors, general: "Your password is weak" });
+        } else if (code == "auth/invalid-email") {
+          setErrors({ ...errors, general: "Invalid email address" });
+        } else {
+          setErrors({ ...errors, general: "Something went wrong" });
+        }
+      }
     } finally {
       setIsLoading(false);
     }
