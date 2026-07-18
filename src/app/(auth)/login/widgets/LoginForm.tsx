@@ -5,6 +5,7 @@ import { Container } from "@/components/Container";
 import { Input } from "@/components/Input";
 import { useAuth } from "@/hooks/useAuth";
 import { AuthFormData, authSchema, ErrorAuthState } from "@/schemas/auth";
+import { FirebaseError } from "firebase/app";
 import Link from "next/link";
 import { ChangeEvent, FormEvent, useState } from "react";
 import { IoEye, IoEyeOff } from "react-icons/io5";
@@ -22,7 +23,7 @@ export function LoginForm() {
     general: null,
   });
   const [isLoading, setIsLoading] = useState(false);
-  const { handleGoogleLogin } = useAuth();
+  const { handleGoogleLogin, handleEmailLogin } = useAuth();
 
   function handleChange(e: ChangeEvent<HTMLInputElement>) {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -56,14 +57,36 @@ export function LoginForm() {
     });
 
     try {
+      const user = await handleEmailLogin(
+        validatedData.email,
+        validatedData.password,
+      );
     } catch (err: any) {
       console.log(err);
-      const message =
-        err?.response?.data?.message ||
-        err?.response?.data?.err ||
-        "Something went wrong";
-
-      setErrors({ ...errors, general: message });
+      if (err instanceof FirebaseError) {
+        const code = err.code || "";
+        if (code === "auth/invalid-credential") {
+          setErrors({ ...errors, general: "Invalid email or password" });
+        } else if (code === "auth/invalid-email") {
+          setErrors({ ...errors, general: "Invalid email address" });
+        } else if (code === "auth/user-disabled") {
+          setErrors({ ...errors, general: "This account has been disabled" });
+        } else if (code === "auth/too-many-requests") {
+          setErrors({
+            ...errors,
+            general: "Too many attempts. Try again later",
+          });
+        } else if (code === "auth/network-request-failed") {
+          setErrors({
+            ...errors,
+            general: "Network error. Check your connection",
+          });
+        } else {
+          setErrors({ ...errors, general: "Something went wrong" });
+        }
+      } else {
+        setErrors({ ...errors, general: "Something went wrong" });
+      }
     } finally {
       setIsLoading(false);
     }

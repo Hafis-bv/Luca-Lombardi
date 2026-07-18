@@ -58,7 +58,6 @@ export function RegisterForm() {
 
     try {
       const user = await handleEmailRegister(email, password);
-      console.log(user);
     } catch (err: any) {
       console.log(err);
       if (err instanceof FirebaseError) {

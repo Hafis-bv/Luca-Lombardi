@@ -38,13 +38,19 @@ export function UserMenu({ user }: UserMenuProps) {
         type="button"
         className="block cursor-pointer size-10 md:size-12"
       >
-        <Image
-          width={48}
-          height={48}
-          src={user.photoURL}
-          alt={user.displayName || "User"}
-          className="rounded-full border-2 border-gray-600 size-10 md:size-12"
-        />
+        {user.photoURL ? (
+          <Image
+            width={48}
+            height={48}
+            src={user.photoURL}
+            alt={user.displayName || "User"}
+            className="rounded-full border-2 border-gray-600 size-10 md:size-12"
+          />
+        ) : (
+          <div className="flex items-center justify-center rounded-full border-2 border-gray-600 bg-gray-700 size-10 md:size-12">
+            <FiUser className="text-gray-300 size-5 md:size-6" />
+          </div>
+        )}
       </button>
 
       <div
