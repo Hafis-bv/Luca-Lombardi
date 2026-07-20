@@ -23,7 +23,7 @@ export function RegisterForm() {
     general: null,
   });
   const [isLoading, setIsLoading] = useState(false);
-  const { handleEmailRegister } = useAuth();
+  const { handleEmailRegister, handleGoogleLogin } = useAuth();
 
   function handleChange(e: ChangeEvent<HTMLInputElement>) {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -81,7 +81,10 @@ export function RegisterForm() {
       <Container className="w-full sm:w-150 mx-auto">
         <div className="grid grid-cols-1 gap-5 shadow-2xl rounded-3xl p-8">
           <h1 className="text-4xl tracking-[2px] text-center mb-1">Sign Up</h1>
-          <button className="w-full flex items-center justify-center gap-3 rounded-3xl py-3 font-medium border border-neutral-200 bg-white cursor-pointer transition xl:hover:shadow-md xl:hover:-translate-y-[1px] disabled:opacity-60 disabled:cursor-not-allowed">
+          <button
+            onClick={handleGoogleLogin}
+            className="w-full flex items-center justify-center gap-3 rounded-3xl py-3 font-medium border border-neutral-200 bg-white cursor-pointer transition xl:hover:shadow-md xl:hover:-translate-y-[1px] disabled:opacity-60 disabled:cursor-not-allowed"
+          >
             <span>
               <GoogleIcon />
             </span>
