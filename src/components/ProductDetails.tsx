@@ -4,6 +4,9 @@ import { Collection } from "@/types/collection";
 import BreadCrumb from "./BreadCrumb";
 import { SizeSelector } from "./SizeSelector";
 import { useState } from "react";
+import { useAppDispatch } from "@/hooks/redux";
+import { addToCart } from "@/store/slices/cartSlice";
+import Link from "next/link";
 
 interface ProductDetailProps {
   collection: Collection;
@@ -33,15 +36,35 @@ export default function ProductDetails({ collection }: ProductDetailProps) {
   const [selectedSizeId, setSelectedSizeId] = useState<number | null>(null);
   const selectedSize = collection.sizes.find((s) => s.id == selectedSizeId);
   const [sizeError, setSizeError] = useState<string | null>(null);
+  const dispatch = useAppDispatch();
+  const [justAdded, setJustAdded] = useState(false);
 
   function handleAddToCart() {
     if (!selectedSize) return setSizeError("Please select a size");
     setSizeError(null);
+
+    dispatch(
+      addToCart({
+        id: collection.id,
+        image: collection.image,
+        title: collection.title,
+        price: collection.price,
+        isNew: collection.isNew,
+        collection: collection.collection,
+        size: selectedSize.size,
+        sizeId: selectedSize.id,
+        quantity: 1,
+        stock: selectedSize.stock,
+      }),
+    );
+
+    setJustAdded(true);
   }
 
   function handleSizeSelect(sizeId: number) {
     setSizeError(null);
     setSelectedSizeId(sizeId);
+    setJustAdded(false);
   }
   return (
     <div className="min-h-screen bg-white">
@@ -83,12 +106,21 @@ export default function ProductDetails({ collection }: ProductDetailProps) {
                 <p className="text-xs text-red-500 mt-2">{sizeError}</p>
               )}
               <div className="mt-7 flex flex-col gap-3">
-                <button
-                  onClick={handleAddToCart}
-                  className="h-12 rounded-2xl bg-zinc-900 text-white font-semibold tracking-wide hover:bg-black transition shadow-[0_10px_25px_rgba(0,0,0,0.18)] cursor-pointer"
-                >
-                  Add to cart
-                </button>
+                {justAdded ? (
+                  <Link
+                    className="h-12 flex justify-center items-center rounded-2xl bg-emerald-600 text-white font-semibold tracking-wide shadow-[0_10px_25px_rgba(0,0,0,0.18)] cursor-pointer"
+                    href={"/cart"}
+                  >
+                    Go to cart
+                  </Link>
+                ) : (
+                  <button
+                    onClick={handleAddToCart}
+                    className="h-12 rounded-2xl bg-zinc-900 text-white font-semibold tracking-wide hover:bg-black transition shadow-[0_10px_25px_rgba(0,0,0,0.18)] cursor-pointer"
+                  >
+                    Add to cart
+                  </button>
+                )}
               </div>
               <div className="mt-8 grid grid-cols-3 gap-3">
                 {productBenefits.map((ben) => (
