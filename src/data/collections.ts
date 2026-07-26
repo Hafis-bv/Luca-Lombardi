@@ -17,9 +17,9 @@ export const womenCollection = Array.from({ length: 10 }, (_, i) => ({
 
 export const menCollection = Array.from({ length: 10 }, (_, i) => ({
   id: i + 11,
-  title: "Abbas",
+  title: "Fashion",
   price: 557,
-  image: "https://luca-lombardi-three.vercel.app/men/urban.png",
+  image: "/men.jpg",
   isNew: i % 2 === 0,
   collection: "men-collection",
   popular: i % 3 === 0,
@@ -36,8 +36,7 @@ export const sunglassesCollection = Array.from({ length: 10 }, (_, i) => ({
   id: i + 21,
   title: "Sunglasses",
   price: 557,
-  image:
-    "https://luca-lombardi-three.vercel.app/sunglasses/sunglasses-milan.png",
+  image: "/sunglasses.jpg",
   isNew: i % 2 === 0,
   collection: "sunglasses-collection",
   popular: i % 3 === 0,
