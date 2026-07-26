@@ -90,7 +90,7 @@ export function Cart() {
                   <CartRow key={`${item.id}-${item.sizeId}`} item={item} />
                 ))}
               </div>
-              <aside className="h-fit rounded-3xl border border-black/10 bg-white p-6 shadow-sm lg:sticky lg:top-24">
+              <aside className="h-fit rounded-3xl border border-black/10 bg-white p-6 shadow-sm lg:sticky lg:top-54">
                 <h2 className="text-lg font-semibold text-gray-900">
                   Order summary
                 </h2>
