@@ -4,7 +4,7 @@ import { Container } from "@/components/Container";
 import { useAppSelector } from "@/hooks/redux";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CartRow } from "./CartRow";
 
 const FREE_SHIPPING_THRESHOLD = 200;
@@ -31,6 +31,11 @@ export function Cart() {
     type: "percent" | "flat";
     value: number;
   } | null>(null);
+
+  const [isHydrated, setIsHydrated] = useState(false);
+  useEffect(() => {
+    setIsHydrated(true);
+  }, []);
 
   const subtotal = cartItems.reduce((acc, curr) => {
     return acc + curr.price * curr.quantity;
@@ -67,7 +72,7 @@ export function Cart() {
   return (
     <div className="pt-20 pb-24">
       <Container>
-        {cartItems.length > 0 ? (
+        {!isHydrated ? null : cartItems.length > 0 ? (
           <div>
             <div className="mb-8 flex flex-col items-start sm:items-end sm:justify-between sm:flex-row gap-4">
               <div>

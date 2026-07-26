@@ -17,8 +17,18 @@ interface InitialState {
   items: CartItem[];
 }
 
+const loadCartFromStorage = (): CartItem[] => {
+  if (typeof window === "undefined") return [];
+  try {
+    const data = localStorage.getItem("cart");
+    return data ? JSON.parse(data) : [];
+  } catch {
+    return [];
+  }
+};
+
 const initialState: InitialState = {
-  items: [],
+  items: loadCartFromStorage(),
 };
 
 export const cartSlice = createSlice({
