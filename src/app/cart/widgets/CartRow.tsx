@@ -1,6 +1,6 @@
 "use client";
 
-import { CartItem } from "@/store/slices/cartSlice";
+import { CartItem, removeFromCart } from "@/store/slices/cartSlice";
 import { AiOutlineMinus, AiOutlinePlus } from "react-icons/ai";
 import { BsTrash3 } from "react-icons/bs";
 import { addToCart, decreaseQuantity } from "@/store/slices/cartSlice";
@@ -63,7 +63,17 @@ export function CartRow({ item }: CartRowProps) {
               <AiOutlinePlus />
             </button>
           </div>
-          <button className="inline-flex cursor-pointer items-center gap-2 rounded-2xl border border-black/10 bg-white px-4 py-2.5 text-sm font-medium text-gray-900 hover:bg-black/5 transition">
+          <button
+            onClick={() =>
+              dispatch(
+                removeFromCart({
+                  id: item.id,
+                  sizeId: item.sizeId,
+                }),
+              )
+            }
+            className="inline-flex cursor-pointer items-center gap-2 rounded-2xl border border-black/10 bg-white px-4 py-2.5 text-sm font-medium text-gray-900 hover:bg-black/5 transition"
+          >
             <BsTrash3 /> Remove
           </button>
         </div>
