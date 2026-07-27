@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { store } from "../store";
 
 export interface CartItem {
   id: number;
@@ -17,18 +18,20 @@ interface InitialState {
   items: CartItem[];
 }
 
-const loadCartFromStorage = (): CartItem[] => {
-  if (typeof window === "undefined") return [];
-  try {
-    const data = localStorage.getItem("cart");
-    return data ? JSON.parse(data) : [];
-  } catch {
-    return [];
-  }
-};
+// const loadCartFromStorage = (): CartItem[] => {
+//   if (typeof window === "undefined") return [];
+//   try {
+//     const data = localStorage.getItem(
+//       `cart_${store.getState().auth.user?.uid}`,
+//     );
+//     return data ? JSON.parse(data) : [];
+//   } catch {
+//     return [];
+//   }
+// };
 
 const initialState: InitialState = {
-  items: loadCartFromStorage(),
+  items: [],
 };
 
 export const cartSlice = createSlice({
@@ -75,8 +78,11 @@ export const cartSlice = createSlice({
         (item) => !(item.id === id && item.sizeId === sizeId),
       );
     },
+    setCart: (state, action: PayloadAction<CartItem[]>) => {
+      state.items = action.payload;
+    },
   },
 });
 
-export const { addToCart, decreaseQuantity, removeFromCart } =
+export const { addToCart, decreaseQuantity, removeFromCart, setCart } =
   cartSlice.actions;

@@ -6,10 +6,12 @@ import { logout, setLoading, setUser } from "@/store/slices/authSlice";
 import { onAuthStateChanged } from "firebase/auth";
 import { useEffect } from "react";
 import { CustomLoading } from "./CustomLoading";
+import { addToCart, setCart } from "@/store/slices/cartSlice";
 
 export function AuthListener() {
   const dispatch = useAppDispatch();
-  const { loading } = useAppSelector((state) => state.auth);
+  const cart = useAppSelector((state) => state.cart.items);
+  const { loading, user } = useAppSelector((state) => state.auth);
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(firebaseAuth, (firebaseUser) => {
       if (firebaseUser) {
@@ -21,6 +23,15 @@ export function AuthListener() {
             photoURL: firebaseUser.photoURL!,
           }),
         );
+        const cart = JSON.parse(
+          localStorage.getItem(`cart_${firebaseUser.uid}`) ?? "[]",
+        );
+        dispatch(setCart(cart));
+        const pending = sessionStorage.getItem("pendingCartItem");
+        if (pending) {
+          dispatch(addToCart(JSON.parse(pending)));
+          sessionStorage.removeItem("pendingCartItem");
+        }
       } else {
         dispatch(logout());
       }
@@ -28,6 +39,11 @@ export function AuthListener() {
     });
     return unsubscribe;
   }, [dispatch]);
+
+  useEffect(() => {
+    if (!user) return;
+    localStorage.setItem(`cart_${user?.uid}`, JSON.stringify(cart));
+  }, [cart, user]);
 
   if (loading) {
     return <CustomLoading />;

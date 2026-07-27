@@ -1,0 +1,14 @@
+import { Metadata } from "next";
+import { Profile } from "./widgets/Profile";
+
+export const metadata: Metadata = {
+  title: "Profile",
+};
+
+export default function ProfilePage() {
+  return (
+    <>
+      <Profile />
+    </>
+  );
+}

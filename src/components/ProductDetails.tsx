@@ -4,9 +4,10 @@ import { Collection } from "@/types/collection";
 import BreadCrumb from "./BreadCrumb";
 import { SizeSelector } from "./SizeSelector";
 import { useState } from "react";
-import { useAppDispatch } from "@/hooks/redux";
+import { useAppDispatch, useAppSelector } from "@/hooks/redux";
 import { addToCart } from "@/store/slices/cartSlice";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 interface ProductDetailProps {
   collection: Collection;
@@ -38,25 +39,31 @@ export default function ProductDetails({ collection }: ProductDetailProps) {
   const [sizeError, setSizeError] = useState<string | null>(null);
   const dispatch = useAppDispatch();
   const [justAdded, setJustAdded] = useState(false);
+  const { user } = useAppSelector((state) => state.auth);
+  const router = useRouter();
 
   function handleAddToCart() {
     if (!selectedSize) return setSizeError("Please select a size");
+    const product = {
+      id: collection.id,
+      image: collection.image,
+      title: collection.title,
+      price: collection.price,
+      isNew: collection.isNew,
+      collection: collection.collection,
+      size: selectedSize.size,
+      sizeId: selectedSize.id,
+      quantity: 1,
+      stock: selectedSize.stock,
+    };
+    if (!user) {
+      sessionStorage.setItem(`pendingCartItem`, JSON.stringify(product));
+      router.push("/login");
+      return;
+    }
     setSizeError(null);
 
-    dispatch(
-      addToCart({
-        id: collection.id,
-        image: collection.image,
-        title: collection.title,
-        price: collection.price,
-        isNew: collection.isNew,
-        collection: collection.collection,
-        size: selectedSize.size,
-        sizeId: selectedSize.id,
-        quantity: 1,
-        stock: selectedSize.stock,
-      }),
-    );
+    dispatch(addToCart(product));
 
     setJustAdded(true);
   }
@@ -108,7 +115,7 @@ export default function ProductDetails({ collection }: ProductDetailProps) {
               <div className="mt-7 flex flex-col gap-3">
                 {justAdded ? (
                   <Link
-                    className="h-12 flex justify-center items-center rounded-2xl bg-emerald-600 text-white font-semibold tracking-wide shadow-[0_10px_25px_rgba(0,0,0,0.18)] cursor-pointer"
+                    className="h-12 flex justify-center items-center rounded-2xl bg-transparent border-2 border-black text-black font-semibold tracking-wide shadow-[0_10px_25px_rgba(0,0,0,0.18)] cursor-pointer"
                     href={"/cart"}
                   >
                     Go to cart
