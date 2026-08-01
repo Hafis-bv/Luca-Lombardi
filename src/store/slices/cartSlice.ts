@@ -1,8 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { store } from "../store";
 
 export interface CartItem {
-  id: number;
+  id: string;
   image: string;
   title: string;
   price: number;
@@ -17,18 +16,6 @@ export interface CartItem {
 interface InitialState {
   items: CartItem[];
 }
-
-// const loadCartFromStorage = (): CartItem[] => {
-//   if (typeof window === "undefined") return [];
-//   try {
-//     const data = localStorage.getItem(
-//       `cart_${store.getState().auth.user?.uid}`,
-//     );
-//     return data ? JSON.parse(data) : [];
-//   } catch {
-//     return [];
-//   }
-// };
 
 const initialState: InitialState = {
   items: [],
@@ -54,7 +41,7 @@ export const cartSlice = createSlice({
     },
     decreaseQuantity: (
       state,
-      action: PayloadAction<{ id: number; sizeId: number }>,
+      action: PayloadAction<{ id: string; sizeId: number }>,
     ) => {
       const { id, sizeId } = action.payload;
       const existingItem = state.items.find(
@@ -71,7 +58,7 @@ export const cartSlice = createSlice({
 
     removeFromCart: (
       state,
-      action: PayloadAction<{ id: number; sizeId: number }>,
+      action: PayloadAction<{ id: string; sizeId: number }>,
     ) => {
       const { id, sizeId } = action.payload;
       state.items = state.items.filter(

@@ -6,9 +6,12 @@ import { useAppSelector } from "@/hooks/redux";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { CartRow } from "./CartRow";
+import { useRouter } from "next/navigation";
+import axios from "axios";
 
-const FREE_SHIPPING_THRESHOLD = 200;
-const SHIPPING_RATE = 0.1;
+export const FREE_SHIPPING_THRESHOLD = 200;
+export const SHIPPING_RATE = 0.1;
+export const TAX_RATE = 0.05;
 
 const PROMO_CODES: Record<
   string,
@@ -24,6 +27,8 @@ const PROMO_CODES: Record<
 
 export function Cart() {
   const { items: cartItems } = useAppSelector((state) => state.cart);
+  const { user } = useAppSelector((state) => state.auth);
+  const router = useRouter();
   const [promoValue, setPromoValue] = useState("");
   const [promoError, setPromoError] = useState<string | null>(null);
   const [appliedPromo, setAppliedPromo] = useState<{
@@ -41,7 +46,7 @@ export function Cart() {
     return acc + curr.price * curr.quantity;
   }, 0);
 
-  const tax = Number((subtotal * 0.05).toFixed(2));
+  const tax = Number((subtotal * TAX_RATE).toFixed(2));
   const shipping =
     subtotal > FREE_SHIPPING_THRESHOLD ? 0 : subtotal * SHIPPING_RATE;
 
@@ -67,6 +72,19 @@ export function Cart() {
     setAppliedPromo(null);
     setPromoError(null);
     setPromoValue("");
+  }
+
+  async function handleCheckout() {
+    if (!user) return router.push("/login");
+    try {
+      const res = await axios.post("/api/checkout", {
+        userId: user.uid,
+        items: cartItems,
+      });
+      window.location.href = res.data.url;
+    } catch (err) {
+      console.log(err);
+    }
   }
 
   return (
@@ -175,7 +193,10 @@ export function Cart() {
                     </>
                   )}
                 </div>
-                <button className="mt-6 w-full cursor-pointer rounded-2xl bg-black px-5 py-3 text-sm font-medium text-white hover:opacity-90 transition">
+                <button
+                  onClick={handleCheckout}
+                  className="mt-6 w-full cursor-pointer rounded-2xl bg-black px-5 py-3 text-sm font-medium text-white hover:opacity-90 transition"
+                >
                   Checkout
                 </button>
                 <p className="mt-3 text-center text-xs text-gray-500">

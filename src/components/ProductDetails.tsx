@@ -92,7 +92,7 @@ export default function ProductDetails({ collection }: ProductDetailProps) {
               </div>
             </div>
           </section>
-          <section className="w-full lg:sticky lg:top-8 h-fit">
+          <section className="w-full lg:sticky lg:top-54 h-fit">
             <div className="rounded-3xl border border-zinc-100 bg-white shadow-[0_10px_40px_rgba(0,0,0,0.06)] p-6 sm:p-8">
               <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight text-zinc-900">
                 {collection.title}

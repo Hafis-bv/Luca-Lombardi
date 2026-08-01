@@ -1,4 +1,5 @@
 "use client";
+
 import { Container } from "@/components/Container";
 import { CollectionCard } from "@/components/CollectionCard";
 import { useState } from "react";
@@ -12,22 +13,29 @@ export function Collections({ collection }: CollectionsProps) {
   const [showMore, setShowMore] = useState(4);
 
   function handleShowMore() {
-    if (collection.length > showMore) setShowMore(showMore + 4);
-    else setShowMore(4);
+    if (showMore >= collection.length) {
+      setShowMore(4);
+    } else {
+      setShowMore((prev) => prev + 4);
+    }
   }
+
   return (
     <div className="py-30">
-      <Container className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-8">
+      <Container className="grid justify-center gap-8 [grid-template-columns:repeat(auto-fit,300px)]">
         {collection.slice(0, showMore).map((item) => (
           <CollectionCard key={item.id} collection={item} />
         ))}
       </Container>
-      <button
-        onClick={handleShowMore}
-        className="bg-black rounded-3xl border border-transparent text-white font-medium text-lg py-3 px-8 block mx-auto mt-15 cursor-pointer xl:hover:bg-transparent xl:hover:border-black xl:hover:text-black transition-all duration-300 "
-      >
-        {collection.length < showMore ? "Show less" : "Show more"}
-      </button>
+
+      {collection.length > 4 && (
+        <button
+          onClick={handleShowMore}
+          className="mx-auto mt-15 block cursor-pointer rounded-3xl border border-transparent bg-black px-8 py-3 text-lg font-medium text-white transition-all duration-300 xl:hover:border-black xl:hover:bg-transparent xl:hover:text-black"
+        >
+          {showMore >= collection.length ? "Show less" : "Show more"}
+        </button>
+      )}
     </div>
   );
 }

@@ -9,11 +9,15 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: "https",
-        hostname: "https://luca-lombardi-three.vercel.app",
+        hostname: "luca-lombardi-three.vercel.app",
       },
       {
         protocol: "https",
-        hostname: "https://luca-lombardi.store",
+        hostname: "luca-lombardi.store",
+      },
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
       },
     ],
   },

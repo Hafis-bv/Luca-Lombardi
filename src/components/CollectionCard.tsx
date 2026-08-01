@@ -8,24 +8,26 @@ interface CardProps {
 export function CollectionCard({ collection }: CardProps) {
   return (
     <Link
-      className="flex flex-col items-center justify-center text-center max-w-85 mx-auto"
       href={`/${collection.collection}/${collection.id}`}
+      className="flex w-75 flex-col"
     >
-      <div className="relative w-full">
+      <div className="relative h-[400px] w-75 overflow-hidden rounded-xl shadow-2xl">
         <img
           src={collection.image}
           alt={collection.title}
-          className="h-100 object-cover rounded-xl w-full shadow-2xl"
+          className="h-full w-full object-cover"
         />
+
         {collection.isNew && (
           <span className="absolute left-3 top-3 rounded-full bg-black px-3 py-1 text-xs font-semibold uppercase tracking-wide text-white">
             New
           </span>
         )}
       </div>
-      <div className="flex items-center justify-between mt-7 w-full px-2">
-        <h2>{collection.title}</h2>
-        <span className="text-sm">{collection.price}$</span>
+
+      <div className="mt-7 flex w-full items-center justify-between gap-3 px-2">
+        <h2 className="truncate">{collection.title}</h2>
+        <span className="shrink-0 text-sm">{collection.price}$</span>
       </div>
     </Link>
   );

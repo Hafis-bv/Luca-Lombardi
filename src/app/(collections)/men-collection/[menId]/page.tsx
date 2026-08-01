@@ -1,5 +1,5 @@
 import ProductDetails from "@/components/ProductDetails";
-import { menCollection } from "@/data/collections";
+import { getProductById } from "@/utils/products";
 import { notFound } from "next/navigation";
 
 interface MenDetailsPageProps {
@@ -8,7 +8,7 @@ interface MenDetailsPageProps {
 
 export async function generateMetadata({ params }: MenDetailsPageProps) {
   const { menId } = await params;
-  const product = menCollection.find((col) => col.id == Number(menId));
+  const product = await getProductById(menId);
 
   if (!product)
     return {
@@ -21,7 +21,7 @@ export async function generateMetadata({ params }: MenDetailsPageProps) {
 
 export default async function MenDetailsPage({ params }: MenDetailsPageProps) {
   const { menId } = await params;
-  const product = menCollection.find((col) => col.id == Number(menId));
+  const product = await getProductById(menId);
 
   if (!product) return notFound();
 

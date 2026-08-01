@@ -20,8 +20,6 @@ export default function NewCollection({
   collections,
   delay,
 }: NewCollectionProps) {
-  const newCollections = collections.filter((c) => c.isNew);
-
   const breakpoints = {
     320: {
       slidesPerView: 1,
@@ -57,7 +55,7 @@ export default function NewCollection({
           disableOnInteraction: false,
         }}
       >
-        {newCollections.map((collection) => (
+        {collections.map((collection) => (
           <SwiperSlide key={collection.id}>
             <CollectionCard collection={collection} />
           </SwiperSlide>

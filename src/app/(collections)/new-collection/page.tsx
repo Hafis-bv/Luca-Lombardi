@@ -1,17 +1,18 @@
 import { Hero } from "@/components/Hero";
 import NewCollection from "@/components/NewCollection";
-import {
-  menCollection,
-  sunglassesCollection,
-  womenCollection,
-} from "@/data/collections";
+import { getProductsByNewCollection } from "@/utils/products";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "New Collection",
 };
 
-export default function NewCollectionPage() {
+export default async function NewCollectionPage() {
+  const menCollection = await getProductsByNewCollection("men-collection");
+  const womenCollection = await getProductsByNewCollection("women-collection");
+  const sunglassesCollection = await getProductsByNewCollection(
+    "sunglasses-collection",
+  );
   return (
     <>
       <Hero

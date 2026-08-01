@@ -1,5 +1,5 @@
 import ProductDetails from "@/components/ProductDetails";
-import { sunglassesCollection } from "@/data/collections";
+import { getProductById } from "@/utils/products";
 import { notFound } from "next/navigation";
 
 interface SunglassesDetailsPageProps {
@@ -8,9 +8,7 @@ interface SunglassesDetailsPageProps {
 
 export async function generateMetadata({ params }: SunglassesDetailsPageProps) {
   const { sunglassesId } = await params;
-  const product = sunglassesCollection.find(
-    (col) => col.id == Number(sunglassesId),
-  );
+  const product = await getProductById(sunglassesId);
 
   if (!product)
     return {
@@ -25,9 +23,7 @@ export default async function SunglassesDetailsPage({
   params,
 }: SunglassesDetailsPageProps) {
   const { sunglassesId } = await params;
-  const product = sunglassesCollection.find(
-    (col) => col.id == Number(sunglassesId),
-  );
+  const product = await getProductById(sunglassesId);
 
   if (!product) return notFound();
 

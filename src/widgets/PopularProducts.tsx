@@ -4,10 +4,12 @@ import { Container } from "@/components/Container";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import { HiChevronLeft, HiChevronRight } from "react-icons/hi2";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Swiper as SwiperType } from "swiper";
 import { CollectionCard } from "@/components/CollectionCard";
 import { collections } from "@/data/collections";
+import { Collection } from "@/types/collection";
+import { getPopularProducts } from "@/utils/products";
 
 export function PopularProducts() {
   const breakpoints = {
@@ -23,12 +25,24 @@ export function PopularProducts() {
     1280: {
       slidesPerView: 4,
     },
-    1340: {
-      slidesPerView: 5,
-    },
   };
   const [swiper, setSwiper] = useState<SwiperType | null>(null);
   const popularCollections = collections.filter((col) => col.popular);
+  const [products, setProducts] = useState<Collection[]>([]);
+
+  useEffect(() => {
+    async function getProducts() {
+      try {
+        const res = await getPopularProducts();
+        setProducts(res);
+      } catch (err) {
+        console.log(err);
+      }
+    }
+
+    getProducts();
+  }, []);
+
   return (
     <div className="bg-slate-800 text-white py-30">
       <Container className="flex flex-col text-center justify-center gap-4 sm:gap-8">
@@ -38,12 +52,12 @@ export function PopularProducts() {
           <Swiper
             onSwiper={setSwiper}
             spaceBetween={32}
-            className="w-full"
+            className="w-full flex justify-center mx-auto"
             slidesPerView={5}
             loop
             breakpoints={breakpoints}
           >
-            {popularCollections.map((col) => (
+            {products.map((col) => (
               <SwiperSlide key={col.id}>
                 <CollectionCard collection={col} />
               </SwiperSlide>

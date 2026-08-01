@@ -1,5 +1,5 @@
 import ProductDetails from "@/components/ProductDetails";
-import { womenCollection } from "@/data/collections";
+import { getProductById } from "@/utils/products";
 import { notFound } from "next/navigation";
 
 interface WomenDetailsPageProps {
@@ -8,7 +8,7 @@ interface WomenDetailsPageProps {
 
 export async function generateMetadata({ params }: WomenDetailsPageProps) {
   const { womenId } = await params;
-  const product = womenCollection.find((col) => col.id == Number(womenId));
+  const product = await getProductById(womenId);
 
   if (!product)
     return {
@@ -23,7 +23,7 @@ export default async function WomenDetailsPage({
   params,
 }: WomenDetailsPageProps) {
   const { womenId } = await params;
-  const product = womenCollection.find((col) => col.id == Number(womenId));
+  const product = await getProductById(womenId);
 
   if (!product) return notFound();
 

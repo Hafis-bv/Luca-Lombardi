@@ -7,7 +7,7 @@ export interface CollectionSize {
 }
 
 export interface Collection {
-  id: number;
+  id: string;
   image: string;
   title: string;
   price: number;
