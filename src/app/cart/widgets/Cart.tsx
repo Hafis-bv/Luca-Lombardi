@@ -1,91 +1,34 @@
 "use client";
 
 import { Container } from "@/components/Container";
-import { useAppSelector } from "@/hooks/redux";
-
 import Link from "next/link";
-import { useEffect, useState } from "react";
 import { CartRow } from "./CartRow";
-import { useRouter } from "next/navigation";
-import axios from "axios";
-
-export const FREE_SHIPPING_THRESHOLD = 200;
-export const SHIPPING_RATE = 0.1;
-export const TAX_RATE = 0.05;
-
-const PROMO_CODES: Record<
-  string,
-  {
-    type: "percent" | "flat";
-    value: number;
-  }
-> = {
-  SAVE10: { type: "percent", value: 10 },
-  SAVE20: { type: "percent", value: 20 },
-  FLAT20: { type: "flat", value: 20 },
-};
+import { useEffect, useState } from "react";
+import { useCart } from "@/hooks/useCart";
 
 export function Cart() {
-  const { items: cartItems } = useAppSelector((state) => state.cart);
-  const { user } = useAppSelector((state) => state.auth);
-  const router = useRouter();
-  const [promoValue, setPromoValue] = useState("");
-  const [promoError, setPromoError] = useState<string | null>(null);
-  const [appliedPromo, setAppliedPromo] = useState<{
-    code: string;
-    type: "percent" | "flat";
-    value: number;
-  } | null>(null);
-
   const [isHydrated, setIsHydrated] = useState(false);
   useEffect(() => {
     setIsHydrated(true);
   }, []);
 
-  const subtotal = cartItems.reduce((acc, curr) => {
-    return acc + curr.price * curr.quantity;
-  }, 0);
-
-  const tax = Number((subtotal * TAX_RATE).toFixed(2));
-  const shipping =
-    subtotal > FREE_SHIPPING_THRESHOLD ? 0 : subtotal * SHIPPING_RATE;
-
-  const discount = appliedPromo
-    ? appliedPromo.type == "percent"
-      ? subtotal * (appliedPromo.value / 100)
-      : appliedPromo.value
-    : 0;
-
-  const total = Number((subtotal + tax + shipping - discount).toFixed(2));
-
-  function handleApplyPromo() {
-    const code = promoValue.trim().toUpperCase();
-    if (!code) return setPromoError("Enter a promocode");
-
-    const match = PROMO_CODES[code];
-    if (!match) return setPromoError("Invalid promocode");
-
-    setAppliedPromo({ code, ...match });
-    setPromoError(null);
-  }
-  function handleRemovePromo() {
-    setAppliedPromo(null);
-    setPromoError(null);
-    setPromoValue("");
-  }
-
-  async function handleCheckout() {
-    if (!user) return router.push("/login");
-    try {
-      const res = await axios.post("/api/checkout", {
-        userId: user.uid,
-        items: cartItems,
-      });
-      window.location.href = res.data.url;
-    } catch (err) {
-      console.log(err);
-    }
-  }
+  const {
+    cartItems,
+    subtotal,
+    shipping,
+    tax,
+    discount,
+    total,
+    promoValue,
+    setPromoValue,
+    promoError,
+    setPromoError,
+    appliedPromo,
+    applyPromo,
+    removePromo,
+    checkout,
+    isCheckingOut,
+  } = useCart();
 
   return (
     <div className="pt-20 pb-24">
@@ -156,7 +99,7 @@ export function Cart() {
                         {appliedPromo.code} applied
                       </span>
                       <button
-                        onClick={handleRemovePromo}
+                        onClick={removePromo}
                         className="text-xs font-medium text-gray-500 hover:text-gray-800 transition cursor-pointer"
                       >
                         Remove
@@ -167,7 +110,7 @@ export function Cart() {
                       <div className="flex gap-2">
                         <input
                           onKeyDown={(e) => {
-                            if (e.key == "Enter") handleApplyPromo();
+                            if (e.key == "Enter") applyPromo();
                           }}
                           value={promoValue}
                           onChange={(e) => {
@@ -179,7 +122,7 @@ export function Cart() {
                           type="text"
                         />
                         <button
-                          onClick={handleApplyPromo}
+                          onClick={applyPromo}
                           className="rounded-xl border border-black/10 bg-white px-4 py-2 text-sm font-medium text-gray-900 hover:bg-black/5 transition cursor-pointer"
                         >
                           Apply
@@ -194,10 +137,11 @@ export function Cart() {
                   )}
                 </div>
                 <button
-                  onClick={handleCheckout}
+                  disabled={isCheckingOut}
+                  onClick={checkout}
                   className="mt-6 w-full cursor-pointer rounded-2xl bg-black px-5 py-3 text-sm font-medium text-white hover:opacity-90 transition"
                 >
-                  Checkout
+                  {isCheckingOut ? "Redirecting..." : "Checkout"}
                 </button>
                 <p className="mt-3 text-center text-xs text-gray-500">
                   Secure checkout • Fast delivery
