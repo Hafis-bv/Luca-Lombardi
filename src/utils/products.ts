@@ -9,6 +9,16 @@ import {
   where,
 } from "firebase/firestore";
 
+export async function getAllProducts(): Promise<Collection[]> {
+  const productsRef = firestoreCollection(db, "products");
+  const snapshot = await getDocs(productsRef);
+
+  return snapshot.docs.map((doc) => ({
+    id: doc.id,
+    ...doc.data(),
+  })) as Collection[];
+}
+
 export async function getProductsByCollection(
   collection: string,
 ): Promise<Collection[]> {

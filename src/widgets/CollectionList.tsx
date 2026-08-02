@@ -1,14 +1,30 @@
 "use client";
 
-import { collections } from "@/data/collections";
 import { useAppSelector } from "@/hooks/redux";
 import { CollectionCard } from "@/components/CollectionCard";
 import { Container } from "@/components/Container";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Fuse from "fuse.js";
+import { Collection } from "@/types/collection";
+import { getAllProducts } from "@/utils/products";
 
 export function CollectionList() {
   const { query } = useAppSelector((state) => state.search);
+
+  const [collections, setCollections] = useState<Collection[]>([]);
+
+  useEffect(() => {
+    async function getCollections() {
+      try {
+        const res = await getAllProducts();
+        setCollections(res);
+      } catch (err) {
+        console.log(err);
+      }
+    }
+
+    getCollections();
+  }, []);
 
   const fuse = useMemo(() => {
     return new Fuse(collections, {
