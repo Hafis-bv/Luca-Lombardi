@@ -27,9 +27,9 @@ export function AuthListener() {
           localStorage.getItem(`cart_${firebaseUser.uid}`) ?? "[]",
         );
         dispatch(setCart(cart));
-        const pending = JSON.parse(sessionStorage.getItem("pendingCartItem"));
+        const pending = sessionStorage.getItem("pendingCartItem");
         if (pending) {
-          dispatch(addToCart(pending));
+          dispatch(addToCart(JSON.parse(pending)));
           sessionStorage.removeItem("pendingCartItem");
         }
       } else {
