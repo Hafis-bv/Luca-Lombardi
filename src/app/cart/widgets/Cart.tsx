@@ -5,12 +5,16 @@ import Link from "next/link";
 import { CartRow } from "./CartRow";
 import { useEffect, useState } from "react";
 import { useCart } from "@/hooks/useCart";
+import { useAppDispatch } from "@/hooks/redux";
+import { clearCart } from "@/store/slices/cartSlice";
 
 export function Cart() {
   const [isHydrated, setIsHydrated] = useState(false);
   useEffect(() => {
     setIsHydrated(true);
   }, []);
+
+  const dispatch = useAppDispatch();
 
   const {
     cartItems,
@@ -43,12 +47,20 @@ export function Cart() {
                   in your cart
                 </p>
               </div>
-              <Link
-                href={"/"}
-                className="rounded-2xl border border-black/10 bg-white px-5 py-2.5 text-sm font-medium text-gray-900 hover:bg-black/5 transition"
-              >
-                Continue shopping
-              </Link>
+              <div className="flex flex-row-reverse gap-3">
+                <button
+                  onClick={() => dispatch(clearCart())}
+                  className="rounded-2xl border border-black/10 bg-white px-5 py-2.5 text-sm font-medium text-red-500 hover:bg-red-50 hover:border-red-200 transition cursor-pointer"
+                >
+                  Clear cart
+                </button>
+                <Link
+                  href={"/"}
+                  className="rounded-2xl border border-black/10 bg-white px-5 py-2.5 text-sm font-medium text-gray-900 hover:bg-black/5 transition"
+                >
+                  Continue shopping
+                </Link>
+              </div>
             </div>
             <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_380px]">
               <div className="space-y-4">
