@@ -1,98 +1,70 @@
+"use client";
+
 import { Container } from "@/components/Container";
+import { useAppSelector } from "@/hooks/redux";
+import { db } from "@/lib/firebase";
+import { Order, OrderStatus } from "@/types/order";
+import { collection, getDocs, query, where } from "firebase/firestore";
 import Image from "next/image";
-
-type OrderStatus = "Processing" | "Shipped" | "Delivered";
-
-interface OrderItem {
-  id: number;
-  title: string;
-  image: string;
-  size: string;
-  quantity: number;
-  price: number;
-}
-
-interface Order {
-  id: string;
-  date: string;
-  status: OrderStatus;
-  total: number;
-  items: OrderItem[];
-}
-
-const orders: Order[] = [
-  {
-    id: "LL-10248",
-    date: "August 2, 2026",
-    status: "Shipped",
-    total: 258,
-    items: [
-      {
-        id: 1,
-        title: "Elegant Silk Blouse",
-        image: "/women.jpeg",
-        size: "M",
-        quantity: 1,
-        price: 129,
-      },
-      {
-        id: 2,
-        title: "Classic Linen Trousers",
-        image: "/men.jpg",
-        size: "L",
-        quantity: 1,
-        price: 129,
-      },
-    ],
-  },
-  {
-    id: "LL-10194",
-    date: "July 24, 2026",
-    status: "Delivered",
-    total: 159,
-    items: [
-      {
-        id: 3,
-        title: "Signature Sunglasses",
-        image: "/sunglasses.jpg",
-        size: "One size",
-        quantity: 1,
-        price: 159,
-      },
-    ],
-  },
-  {
-    id: "LL-10161",
-    date: "July 16, 2026",
-    status: "Processing",
-    total: 219,
-    items: [
-      {
-        id: 4,
-        title: "Premium Summer Jacket",
-        image: "/men.jpg",
-        size: "M",
-        quantity: 1,
-        price: 219,
-      },
-    ],
-  },
-];
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 function getStatusStyles(status: OrderStatus) {
   switch (status) {
-    case "Delivered":
+    case "delivered":
       return "border-green-200 bg-green-50 text-green-700";
 
-    case "Shipped":
+    case "shipped":
       return "border-blue-200 bg-blue-50 text-blue-700";
 
-    case "Processing":
+    case "processing":
       return "border-amber-200 bg-amber-50 text-amber-700";
+
+    case "cancelled":
+      return "border-red-200 bg-red-50 text-red-700";
+
+    case "pending":
+      return "border-gray-200 bg-gray-50 text-gray-700";
   }
 }
 
+function getStatusLabel(status: OrderStatus) {
+  return status.charAt(0).toUpperCase() + status.slice(1);
+}
+
 export default function Orders() {
+  const { user, loading: authLoading } = useAppSelector((state) => state.auth);
+  const router = useRouter();
+
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!authLoading && !user) router.replace("/login");
+  }, [authLoading, user, router]);
+
+  useEffect(() => {
+    if (!user) return;
+
+    const ordersQuery = query(
+      collection(db, "orders"),
+      where("userId", "==", user.uid),
+    );
+
+    getDocs(ordersQuery)
+      .then((snapshot) => {
+        const fetchedOrders = snapshot.docs.map((doc) => doc.data() as Order);
+        fetchedOrders.sort(
+          (a, b) => b.createdAt.toMillis() - a.createdAt.toMillis(),
+        );
+        setOrders(fetchedOrders);
+      })
+      .finally(() => setLoading(false));
+  }, [user]);
+
+  if (!user) return null;
+
   return (
     <main className="min-h-screen bg-[#f8f8f8] py-16">
       <Container>
@@ -111,7 +83,11 @@ export default function Orders() {
             </p>
           </div>
 
-          {orders.length === 0 ? (
+          {loading ? (
+            <div className="rounded-3xl border border-black/10 bg-white px-6 py-20 text-center">
+              <p className="text-sm text-gray-500">Loading your orders...</p>
+            </div>
+          ) : orders.length === 0 ? (
             <div className="rounded-3xl border border-black/10 bg-white px-6 py-20 text-center">
               <h2 className="text-xl font-semibold text-black">
                 No orders yet
@@ -125,7 +101,7 @@ export default function Orders() {
             <div className="space-y-6">
               {orders.map((order) => (
                 <article
-                  key={order.id}
+                  key={order.stripeSessionId}
                   className="overflow-hidden rounded-3xl border border-black/10 bg-white"
                 >
                   <div className="flex flex-col gap-4 border-b border-black/10 px-5 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-7">
@@ -136,7 +112,7 @@ export default function Orders() {
                         </p>
 
                         <p className="mt-1 text-sm font-semibold text-black">
-                          #{order.id}
+                          #{order.stripeSessionId.slice(-8).toUpperCase()}
                         </p>
                       </div>
 
@@ -146,7 +122,13 @@ export default function Orders() {
                         </p>
 
                         <p className="mt-1 text-sm font-medium text-gray-700">
-                          {order.date}
+                          {order.createdAt
+                            ?.toDate()
+                            .toLocaleDateString(undefined, {
+                              year: "numeric",
+                              month: "long",
+                              day: "numeric",
+                            })}
                         </p>
                       </div>
 
@@ -166,15 +148,15 @@ export default function Orders() {
                         order.status,
                       )}`}
                     >
-                      {order.status}
+                      {getStatusLabel(order.status)}
                     </span>
                   </div>
 
                   <div className="p-5 sm:p-7">
                     <div className="space-y-5">
-                      {order.items.map((item) => (
+                      {order.items.map((item, index) => (
                         <div
-                          key={item.id}
+                          key={`${item.id}-${item.size}-${index}`}
                           className="flex gap-4 border-b border-black/10 pb-5 last:border-b-0 last:pb-0"
                         >
                           <div className="relative h-28 w-24 shrink-0 overflow-hidden rounded-2xl bg-gray-100 sm:h-32 sm:w-28">
@@ -207,6 +189,52 @@ export default function Orders() {
                       ))}
                     </div>
 
+                    {expandedOrderId === order.stripeSessionId && (
+                      <div className="mt-7 space-y-2 rounded-2xl border border-black/10 bg-[#f8f8f8] p-5 text-sm">
+                        <div className="flex items-center justify-between">
+                          <span className="text-gray-500">Subtotal</span>
+                          <span className="font-medium text-black">
+                            ${order.subtotal.toFixed(2)}
+                          </span>
+                        </div>
+
+                        <div className="flex items-center justify-between">
+                          <span className="text-gray-500">Shipping</span>
+                          <span className="font-medium text-black">
+                            ${order.shipping.toFixed(2)}
+                          </span>
+                        </div>
+
+                        <div className="flex items-center justify-between">
+                          <span className="text-gray-500">Tax</span>
+                          <span className="font-medium text-black">
+                            ${order.tax.toFixed(2)}
+                          </span>
+                        </div>
+
+                        {order.discount > 0 && (
+                          <div className="flex items-center justify-between">
+                            <span className="text-gray-500">
+                              Discount
+                              {order.promocode ? ` (${order.promocode})` : ""}
+                            </span>
+                            <span className="font-medium text-green-700">
+                              -${order.discount.toFixed(2)}
+                            </span>
+                          </div>
+                        )}
+
+                        <div className="mt-2 flex items-center justify-between border-t border-black/10 pt-2">
+                          <span className="font-semibold text-black">
+                            Total
+                          </span>
+                          <span className="font-semibold text-black">
+                            ${order.total.toFixed(2)}
+                          </span>
+                        </div>
+                      </div>
+                    )}
+
                     <div className="mt-7 flex flex-col gap-3 border-t border-black/10 pt-5 sm:flex-row sm:items-center sm:justify-between">
                       <p className="text-sm text-gray-500">
                         {order.items.length}{" "}
@@ -216,11 +244,22 @@ export default function Orders() {
 
                       <button
                         type="button"
-                        className="rounded-full bg-black px-6 py-3 text-sm font-medium text-white transition-opacity hover:opacity-80"
+                        onClick={() =>
+                          order.status === "shipped"
+                            ? undefined
+                            : setExpandedOrderId((current) =>
+                                current === order.stripeSessionId
+                                  ? null
+                                  : order.stripeSessionId,
+                              )
+                        }
+                        className="rounded-full cursor-pointer bg-black px-6 py-3 text-sm font-medium text-white transition-opacity hover:opacity-80"
                       >
-                        {order.status === "Shipped"
+                        {order.status === "shipped"
                           ? "Track Order"
-                          : "View Details"}
+                          : expandedOrderId === order.stripeSessionId
+                            ? "Hide Details"
+                            : "View Details"}
                       </button>
                     </div>
                   </div>

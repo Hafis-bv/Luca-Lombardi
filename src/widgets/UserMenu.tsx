@@ -5,7 +5,9 @@ import { IUser } from "@/types/user";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { FaFirstOrder } from "react-icons/fa";
 import { FiLogOut, FiShoppingBag, FiUser } from "react-icons/fi";
+import { LuNotepadText } from "react-icons/lu";
 
 interface UserMenuProps {
   user: IUser;
@@ -28,7 +30,8 @@ export function UserMenu({ user }: UserMenuProps) {
 
   const authorizedNavLinks = [
     { id: 1, title: "Cart", href: "/cart", icon: FiShoppingBag },
-    { id: 2, title: "Profile", href: "/profile", icon: FiUser },
+    { id: 2, title: "Orders", href: "/orders", icon: LuNotepadText },
+    { id: 3, title: "Profile", href: "/profile", icon: FiUser },
   ];
 
   return (

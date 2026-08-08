@@ -1,6 +1,8 @@
 import { PROMO_CODES } from "@/constants/checkout";
+import { adminDb } from "@/lib/firebase-admin";
 import { CartItem } from "@/store/slices/cartSlice";
 import { calculateCartTotals } from "@/utils/pricing";
+import { FieldValue } from "firebase-admin/firestore";
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 
@@ -114,6 +116,33 @@ export async function POST(req: NextRequest) {
       success_url: `${process.env.NEXT_PUBLIC_APP_URL}/checkout/success`,
       cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/checkout/cancel`,
     });
+
+    await adminDb
+      .collection("orders")
+      .doc(session.id)
+      .set({
+        userId,
+        items: items.map((item) => ({
+          id: item.id,
+          title: item.title,
+          image: item.image,
+          size: item.size,
+          quantity: item.quantity,
+          price: item.price,
+          collection: item.collection,
+        })),
+        promocode: normalizedPromocode ?? null,
+        subtotal,
+        tax,
+        shipping,
+        discount,
+        total,
+        status: "pending",
+        stripeSessionId: session.id,
+        stripePaymentIntentId: null,
+        createdAt: FieldValue.serverTimestamp(),
+        updatedAt: FieldValue.serverTimestamp(),
+      });
 
     return NextResponse.json({
       url: session.url,
