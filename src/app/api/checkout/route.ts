@@ -1,26 +1,12 @@
+import { PROMO_CODES } from "@/constants/checkout";
 import { CartItem } from "@/store/slices/cartSlice";
+import { calculateCartTotals } from "@/utils/pricing";
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2026-06-24.dahlia",
 });
-
-const PROMO_CODES: Record<
-  string,
-  {
-    type: "percent" | "flat";
-    value: number;
-  }
-> = {
-  SAVE10: { type: "percent", value: 10 },
-  SAVE20: { type: "percent", value: 20 },
-  FLAT20: { type: "flat", value: 20 },
-};
-
-const FREE_SHIPPING_THRESHOLD = 200;
-const SHIPPING_RATE = 0.1;
-const TAX_RATE = 0.05;
 
 interface ReqBody {
   userId: string;
@@ -40,33 +26,27 @@ export async function POST(req: NextRequest) {
     if (!items || items.length == 0)
       return NextResponse.json({ error: "Cart is empty" }, { status: 400 });
 
-    const subtotal = items.reduce((acc, curr) => {
-      return acc + curr.price * curr.quantity;
-    }, 0);
+    const normalizedPromocode = promocode?.trim().toUpperCase();
 
-    const shipping =
-      subtotal > FREE_SHIPPING_THRESHOLD ? 0 : subtotal * SHIPPING_RATE;
+    if (normalizedPromocode && !PROMO_CODES[normalizedPromocode]) {
+      return NextResponse.json({ error: "Invalid promocode" }, { status: 400 });
+    }
 
-    const tax = Number((subtotal * TAX_RATE).toFixed(2));
+    const { subtotal, tax, shipping, discount, total } = calculateCartTotals(
+      items,
+      normalizedPromocode,
+    );
 
-    let discount = 0;
     let stripeCoupon: string | undefined;
 
-    if (promocode) {
-      const promo = PROMO_CODES[promocode.trim().toUpperCase()];
-
-      if (!promo)
-        return NextResponse.json(
-          { error: "Invalid promo code" },
-          { status: 400 },
-        );
-
-      discount =
-        promo.type === "percent" ? subtotal * (promo.value / 100) : promo.value;
-
+    if (normalizedPromocode) {
+      const promo = PROMO_CODES[normalizedPromocode];
       const coupon = await stripe.coupons.create(
         promo.type === "percent"
-          ? { percent_off: promo.value, duration: "once" }
+          ? {
+              percent_off: promo.value,
+              duration: "once",
+            }
           : {
               amount_off: Math.round(promo.value * 100),
               currency: "usd",
@@ -75,8 +55,6 @@ export async function POST(req: NextRequest) {
       );
       stripeCoupon = coupon.id;
     }
-
-    const total = Number((subtotal + tax + shipping - discount).toFixed(2));
 
     const line_items: Stripe.Checkout.SessionCreateParams.LineItem[] =
       items.map((item) => ({
@@ -126,7 +104,12 @@ export async function POST(req: NextRequest) {
       discounts: stripeCoupon ? [{ coupon: stripeCoupon }] : undefined,
       metadata: {
         userId,
-        promocode: promocode ?? "",
+        promocode: normalizedPromocode ?? "",
+        subtotal: subtotal.toString(),
+        tax: tax.toString(),
+        shipping: shipping.toString(),
+        discount: discount.toString(),
+        total: total.toString(),
       },
       success_url: `${process.env.NEXT_PUBLIC_APP_URL}/checkout/success`,
       cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/checkout/cancel`,

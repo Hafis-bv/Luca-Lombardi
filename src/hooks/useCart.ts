@@ -1,24 +1,11 @@
+"use client";
+
 import { useAppSelector } from "@/hooks/redux";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import axios from "axios";
-
-const FREE_SHIPPING_THRESHOLD = 200;
-const SHIPPING_RATE = 0.1;
-const TAX_RATE = 0.05;
-
-const PROMO_CODES: Record<
-  string,
-  {
-    type: "percent" | "flat";
-    value: number;
-  }
-> = {
-  SAVE10: { type: "percent", value: 10 },
-  SAVE20: { type: "percent", value: 20 },
-  FLAT20: { type: "flat", value: 20 },
-  TIMUR: { type: "flat", value: 100000000 },
-};
+import { calculateCartTotals } from "@/utils/pricing";
+import { PROMO_CODES } from "@/constants/checkout";
 
 export const useCart = () => {
   const { items: cartItems } = useAppSelector((state) => state.cart);
@@ -34,22 +21,6 @@ export const useCart = () => {
     type: "percent" | "flat";
     value: number;
   } | null>(null);
-
-  const subtotal = cartItems.reduce((acc, curr) => {
-    return acc + curr.price * curr.quantity;
-  }, 0);
-
-  const tax = Number((subtotal * TAX_RATE).toFixed(2));
-  const shipping =
-    subtotal > FREE_SHIPPING_THRESHOLD ? 0 : subtotal * SHIPPING_RATE;
-
-  const discount = appliedPromo
-    ? appliedPromo.type == "percent"
-      ? (subtotal + shipping + tax) * (appliedPromo.value / 100)
-      : appliedPromo.value
-    : 0;
-
-  const total = Number((subtotal + tax + shipping - discount).toFixed(2));
 
   function applyPromo() {
     const code = promoValue.trim().toUpperCase();
@@ -67,6 +38,11 @@ export const useCart = () => {
     setPromoError(null);
     setPromoValue("");
   }
+
+  const { subtotal, tax, shipping, discount, total } = calculateCartTotals(
+    cartItems,
+    appliedPromo?.code,
+  );
 
   async function checkout() {
     if (!user) return router.push("/login");
